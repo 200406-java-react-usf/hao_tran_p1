@@ -1,6 +1,6 @@
 import { isValidId, isValidStrings, isValidObject, isPropertyOf } from "../util/validator";
 import { User } from "../models/user";
-import { Post } from "../models/post";
+import { Post } from "../models/reimbursement";
 
 describe('validator', () => {
 
