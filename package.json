@@ -6,7 +6,6 @@
     "scripts": {
         "start": "node ./build/index.js",
         "dev-start": "tsc && node ./build/index.js",
-        "test": "jest --watch --no-cache",
         "build": "tsc"
     },
     "dependencies": {
