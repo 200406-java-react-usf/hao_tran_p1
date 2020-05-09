@@ -3,8 +3,13 @@ import express from 'express';
 import fs from 'fs';
 import morgan from 'morgan';
 import path from 'path';
-// import { sessionMiddleware } from './middleware/session-middleware';
-// import { corsFilter } from './middleware/cors-filter';
+
+
+import { UserRouter } from './routers/user-router';
+import { PostRouter } from './routers/post-router';
+import { AuthRouter } from './routers/auth-router';
+import { sessionMiddleware } from './middleware/session-middleware';
+import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
 
 // environment configuration
@@ -27,12 +32,13 @@ const logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), 
 // web server configuration
 const app = express();
 app.use(morgan('combined', { stream: logStream }));
-// app.use(sessionMiddleware);
-// app.use(corsFilter);
+app.use(sessionMiddleware);
+app.use(corsFilter);
 app.use('/', express.json());
-//app.use('/users', UserRouter);
-
+app.use('/users', UserRouter);
+app.use('/posts', PostRouter);
+app.use('/auth', AuthRouter);
 
 app.listen(8080, () => {
-    console.log(`Application running and listening at: `);
+    console.log(`Application running and listening at: http://localhost:8080`);
 });
