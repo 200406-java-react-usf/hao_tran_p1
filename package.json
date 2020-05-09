@@ -6,9 +6,7 @@
     "scripts": {
         "start": "node ./build/index.js",
         "dev-start": "tsc && node ./build/index.js",
-        "test": "jest --no-cache",
-        "coverage": "jest --coverage --no-cache",
-        "watch-tests": "jest --watch --no-cache",
+        "test": "jest --watch --no-cache",
         "build": "tsc"
     },
     "dependencies": {
@@ -26,10 +24,10 @@
         "@typescript-eslint/eslint-plugin": "^2.29.0",
         "@typescript-eslint/parser": "^2.29.0",
         "eslint": "^6.8.0",
-        "jest": "^25.3.0",
+        "jest": "^25.5.4",
         "morgan": "^1.10.0",
         "nodemon": "^2.0.3",
-        "ts-jest": "^25.4.0",
+        "ts-jest": "^25.5.1",
         "typescript": "^3.8.3"
     },
     "repository": {
