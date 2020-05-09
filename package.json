@@ -1,19 +1,24 @@
 {
-  "name": "hao_tran_p1",
-  "version": "1.0.0",
-  "description": "Project 1 - Expense Reimbursement System",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/200406-java-react-usf/hao_tran_p1-api.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/200406-java-react-usf/hao_tran_p1-api/issues"
-  },
-  "homepage": "https://github.com/200406-java-react-usf/hao_tran_p1-api#readme"
+    "name": "hao_tran_p1",
+    "version": "1.0.0",
+    "description": "Project 1 - Expense Reimbursement System",
+    "main": "index.js",
+    "scripts": {
+        "start": "node ./build/index.js",
+        "dev-start": "tsc && node ./build/index.js",
+        "test": "jest --no-cache",
+        "coverage": "jest --coverage --no-cache",
+        "watch-tests": "jest --watch --no-cache",
+        "build": "tsc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/200406-java-react-usf/hao_tran_p1-api.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/200406-java-react-usf/hao_tran_p1-api/issues"
+    },
+    "homepage": "https://github.com/200406-java-react-usf/hao_tran_p1-api#readme"
 }
