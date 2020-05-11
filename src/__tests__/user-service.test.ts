@@ -189,4 +189,46 @@ describe('userService', () => {
 
     });
 
+    test('should resolve to User when getUserByUniqueKey is given a valid an known key(username)', async () => {
+
+        // Arrange
+        expect.assertions(3);
+        
+        Validator.isValidId = jest.fn().mockReturnValue(true);
+
+        mockRepo.getById = jest.fn().mockImplementation((id: number) => {
+            return new Promise<User>((resolve) => resolve(mockUsers[id - 1]));
+        });
+
+        // Act
+        let query = {
+            username: 'aanderson'
+        }
+        let result = await sut.getUserByUniqueKey(query);
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result.ers_user_id).toBe(1);
+        expect(result.password).toBeUndefined();
+
+    });
+    test('should reject with BadRequestError if invalid key', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(true);
+
+        // Act
+        let query = {
+            test: 'aanderson'
+        }
+        try {
+            await sut.getUserByUniqueKey(9999);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof ResourceNotFoundError).toBe(true);
+        }
+
+    });
 });
