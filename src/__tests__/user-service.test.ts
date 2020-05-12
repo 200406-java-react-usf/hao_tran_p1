@@ -99,7 +99,7 @@ describe('userService', () => {
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result.id).toBe(1);
+        expect(result.ers_user_id).toBe(1);
         expect(result.password).toBeUndefined();
 
     });
@@ -223,11 +223,49 @@ describe('userService', () => {
             test: 'aanderson'
         }
         try {
-            await sut.getUserByUniqueKey(9999);
+            await sut.getUserByUniqueKey(query);
         } catch (e) {
 
             // Assert
-            expect(e instanceof ResourceNotFoundError).toBe(true);
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+    test('should reject with BadRequestError if repo return false', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(false);
+
+        // Act
+        let query = {
+            username: 'aanderson'
+        }
+        try {
+            await sut.getUserByUniqueKey(query);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+    test('should reject with BadRequestError if valid key but no result', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(true);
+
+        // Act
+        let query = {
+            test: 'aanderson'
+        }
+        try {
+            await sut.getUserByUniqueKey(query);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
         }
 
     });
