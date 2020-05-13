@@ -8,7 +8,7 @@ export interface UserSchema {
     role_name: string
 }
 
-export interface PostSchema {
+export interface ReimbSchema {
     reimb_id: number,
     amount: number,
     submitted: Date,

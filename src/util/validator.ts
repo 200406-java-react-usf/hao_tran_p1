@@ -34,13 +34,19 @@ export const isPropertyOf = (prop: string, type: any) => {
 
 }
 
+export const isValidStatus = (status: number) => {
+    return status && status == 1 || status == 2 || status == 3;
+}
+
 export function isEmptyObject<T>(obj: T) {
     return obj && Object.keys(obj).length === 0;
 }
+
 
 export default {
     isValidId,
     isValidStrings,
     isValidObject,
-    isPropertyOf
+    isPropertyOf,
+    isValidStatus
 }
