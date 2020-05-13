@@ -9,9 +9,14 @@ export interface UserSchema {
 }
 
 export interface PostSchema {
-
-}
-
-export interface ThreadSchema {
-    
+    reimb_id: number,
+    amount: number,
+    submitted: Date,
+    resolved: Date,
+    description: string,
+    reciept: any,
+    author: string,
+    resolver: string,
+    reimb_status: string,
+    reimb_type: string
 }

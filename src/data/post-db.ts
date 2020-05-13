@@ -1,4 +1,4 @@
-import { Post } from '../models/reimbursement';
+import { Post } from '../models/reimb';
 
 // challenge: replace this with id generator function
 let id = 1;

@@ -1,5 +1,5 @@
 import data from '../data/post-db';
-import { Post } from '../models/reimbursement';
+import { Post } from '../models/reimb';
 import { CrudRepository } from './crud-repo';
 import { 
     BadRequestError, 

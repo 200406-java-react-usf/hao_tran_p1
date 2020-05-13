@@ -1,5 +1,5 @@
 import express from 'express';
-import { Post } from '../models/reimbursement';
+import { Post } from '../models/reimb';
 import AppConfig from '../config/app';
 
 export const PostRouter = express.Router();
