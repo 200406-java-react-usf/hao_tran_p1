@@ -26,13 +26,13 @@ describe('ReimbService', () => {
 
     let sut: ReimbService;
     let mockRepo;
-
+    let date = new Date();
     let mockReimbs = [
-        new Reimb(1, 100, Date(), Date(), "text", "reciept", "author-test", "resv-test", "pending", "food"),
-        new Reimb(2, 200, Date(), Date(), "text", "reciept", "author-test", "resv-test", "approved", "food"),
-        new Reimb(3, 300, Date(), Date(), "text", "reciept", "author-test", "resv-test", "approved", "food"),
-        new Reimb(4, 400, Date(), Date(), "text", "reciept", "author-test", "resv-test", "approved", "food"),
-        new Reimb(5, 500, Date(), Date(), "text", "reciept", "author-test", "resv-test", "approved", "food")
+        new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food'),
+        new Reimb(2, 200, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'approved', 'food'),
+        new Reimb(3, 300, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'approved', 'food'),
+        new Reimb(4, 400, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'approved', 'food'),
+        new Reimb(5, 500, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'approved', 'food')
     ];
 
     beforeEach(() => {
@@ -314,7 +314,7 @@ describe('ReimbService', () => {
         Validator.isValidId = jest.fn().mockReturnValue(true);
         Validator.isValidStatus = jest.fn().mockReturnValue(true);
         mockRepo.getById = jest.fn().mockReturnValue(mockReimbs[0]);
-        mockReimbs[0].reimb_status = "approved"
+        mockReimbs[0].reimb_status = 'approved'
         mockRepo.update = jest.fn().mockReturnValue(mockReimbs[0]);
 
         // Act
@@ -323,7 +323,7 @@ describe('ReimbService', () => {
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result.reimb_status).toBe("approved");
+        expect(result.reimb_status).toBe('approved');
     });
     test('should reject with BadRequestError if invalid id', async () => {
 
@@ -332,7 +332,7 @@ describe('ReimbService', () => {
         Validator.isValidId = jest.fn().mockReturnValue(false);
         Validator.isValidStatus = jest.fn().mockReturnValue(true);
         mockRepo.getById = jest.fn().mockReturnValue(mockReimbs[0]);
-        mockReimbs[0].reimb_status = "approved"
+        mockReimbs[0].reimb_status = 'approved'
         mockRepo.update = jest.fn().mockReturnValue(mockReimbs[0]);
 
         // Act
@@ -353,7 +353,7 @@ describe('ReimbService', () => {
         Validator.isValidId = jest.fn().mockReturnValue(true);
         Validator.isValidStatus = jest.fn().mockReturnValue(false);
         mockRepo.getById = jest.fn().mockReturnValue(mockReimbs[0]);
-        mockReimbs[0].reimb_status = "approved"
+        mockReimbs[0].reimb_status = 'approved'
         mockRepo.update = jest.fn().mockReturnValue(mockReimbs[0]);
         // Act
         try {
@@ -371,7 +371,7 @@ describe('ReimbService', () => {
         Validator.isValidId = jest.fn().mockReturnValue(true);
         Validator.isValidStatus = jest.fn().mockReturnValue(true);
         mockRepo.getById = jest.fn().mockReturnValue({});
-        mockReimbs[0].reimb_status = "approved"
+        mockReimbs[0].reimb_status = 'approved'
         mockRepo.update = jest.fn().mockReturnValue(mockReimbs[0]);
         // Act
         try {
@@ -394,7 +394,7 @@ describe('ReimbService', () => {
         } catch (e) {
             // Assert
             expect(e instanceof NotImplementedError).toBe(true);
-            
+
         }
     });
 });

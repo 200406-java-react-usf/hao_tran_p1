@@ -1,7 +1,7 @@
-import { UserRepository } from '../repos/user-repo';
+import { ReimbRepository } from '../repos/reimb-repo';
 import * as mockIndex from '..';
 import * as mockMapper from '../util/result-set-mapper';
-import { User } from '../models/user';
+import { Reimb } from '../models/reimb';
 import { InternalServerError } from '../errors/errors';
 
 jest.mock('..', () => {
@@ -14,13 +14,13 @@ jest.mock('..', () => {
 
 jest.mock('../util/result-set-mapper', () => {
     return {
-        mapUserResultSet: jest.fn()
+        mapReimbResultSet: jest.fn()
     };
 });
 
-describe('userRepo', () => {
+describe('reimbRepo', () => {
 
-    let sut = new UserRepository();
+    let sut = new ReimbRepository();
     let mockConnect = mockIndex.connectionPool.connect;
 
     beforeEach(() => {
@@ -31,13 +31,16 @@ describe('userRepo', () => {
                     return {
                         rows: [
                             {
-                                ers_user_id: 1,
-                                username: 'aanderson',
-                                password: 'password',
-                                first_name: 'Alice',
-                                last_name: 'Anderson',
-                                email: 'aanderson@revature.com',
-                                role_name: 'Admin'
+                                reimb_id: 6,
+                                amount: 100,
+                                submitted: new Date(),
+                                resolved: new Date(),
+                                description: 'description',
+                                reciept: "any",
+                                author: "test",
+                                resolver: "test",
+                                reimb_status: "pending",
+                                reimb_type: "food"
                             }
                         ]
                     };
@@ -46,16 +49,16 @@ describe('userRepo', () => {
             };
         });
         
-        (mockMapper.mapUserResultSet as jest.Mock).mockClear();
+        (mockMapper.mapReimbResultSet as jest.Mock).mockClear();
     });
 
-    test('should resolve to an array of Users when getAll retrieves records from data source', async () => {
+    test('should resolve to an array of Reimbs when getAll retrieves records from data source', async () => {
         
         // Arrange
         expect.hasAssertions();
-
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(mockReimb);
 
         // Act
         let result = await sut.getAll();
@@ -110,20 +113,20 @@ describe('userRepo', () => {
         }
     });
 
-    test('should resolve to a User object when getById retrieves a record from data source', async () => {
+    test('should resolve to a Reimb object when getById retrieves a record from data source', async () => {
 
         // Arrange
         expect.hasAssertions();
-
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(mockReimb);
 
         // Act
         let result = await sut.getById(1);
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimb).toBe(true);
 
     });
 
@@ -144,7 +147,7 @@ describe('userRepo', () => {
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimb).toBe(true);
 
     });
 
@@ -152,7 +155,8 @@ describe('userRepo', () => {
 
         // Arrange
         expect.hasAssertions();
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
         (mockConnect as jest.Mock).mockImplementation( () => {
             return {
                 query: jest.fn().mockImplementation( () => { return false; }),
@@ -162,31 +166,32 @@ describe('userRepo', () => {
 
         // Act
         try {
-            await sut.getById(mockUser.ers_user_id);
+            await sut.getById(mockReimb.ers_reimb_id);
         } catch (e) {
             // Assert
             expect(e instanceof InternalServerError).toBe(true);
         }
     });
 
-    test('should resolve to a User object when getUserByUniqueKey retrieves a record from data source', async () => {
+    test('should resolve to a Reimb object when getReimbByUniqueKey retrieves a record from data source', async () => {
 
         // Arrange
         expect.hasAssertions();
 
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(mockReimb);
 
         // Act
-        let result = await sut.getUserByUniqueKey('username', 'aanderson');
+        let result = await sut.getReimbByUniqueKey('reimbname', 'aanderson');
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimb).toBe(true);
 
     });
 
-    test('should resolve to an empty array when getUserByUniqueKey retrieves a record from data source', async () => {
+    test('should resolve to an empty array when getReimbByUniqueKey retrieves a record from data source', async () => {
 
         // Arrange
         expect.hasAssertions();
@@ -199,66 +204,29 @@ describe('userRepo', () => {
         });
 
         // Act
-        let result = await sut.getUserByUniqueKey('username', 'aanderson');
+        let result = await sut.getReimbByUniqueKey('reimbname', 'aanderson');
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimb).toBe(true);
 
     });
 
-    test('should resolve to a User object when getUserByCredentials retrieves a record from data source', async () => {
+    test('should resolve to a Reimb object when save persists a record to the data source', async () => {
 
         // Arrange
         expect.hasAssertions();
 
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(mockReimb);
 
         // Act
-        let result = await sut.getUserByCredentials('username', 'aanderson');
+        let result = await sut.save(mockReimb);
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
-
-    });
-
-    test('should resolve to an empty array when getUserByCredentials retrieves a record from data source', async () => {
-
-        // Arrange
-        expect.hasAssertions();
-        
-        (mockConnect as jest.Mock).mockImplementation(() => {
-            return {
-                query: jest.fn().mockImplementation(() => { return { rows: [] }; }), 
-                release: jest.fn()
-            };
-        });
-
-        // Act
-        let result = await sut.getUserByCredentials('username', 'aanderson');
-
-        // Assert
-        expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
-
-    });
-
-    test('should resolve to a User object when save persists a record to the data source', async () => {
-
-        // Arrange
-        expect.hasAssertions();
-
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
-
-        // Act
-        let result = await sut.save(mockUser);
-
-        // Assert
-        expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimb).toBe(true);
 
     });
 
@@ -266,7 +234,8 @@ describe('userRepo', () => {
 
         // Arrange
         expect.hasAssertions();
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
         (mockConnect as jest.Mock).mockImplementation(() => {
             return {
                 query: jest.fn().mockImplementation(() => { return { rows: [] }; }), 
@@ -275,11 +244,11 @@ describe('userRepo', () => {
         });
 
         // Act
-        let result = await sut.save(mockUser);
+        let result = await sut.save(mockReimb);
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimb).toBe(true);
 
     });
 
@@ -288,11 +257,12 @@ describe('userRepo', () => {
         // Arrange
         expect.hasAssertions();
 
-        let mockUser = new User(1, 'aanderson', 'password', 'Alice', 'Anderson', 'aanderson@revature.com', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(true);
+        let date = new Date();
+        let mockReimb = new Reimb(1, 100, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'pending', 'food');
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(true);
 
         // Act
-        let result = await sut.update(mockUser);
+        let result = await sut.update(mockReimb);
 
         // Assert
         expect(result).toBeTruthy();
@@ -306,7 +276,7 @@ describe('userRepo', () => {
         expect.hasAssertions();
 
         
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(true);
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(true);
 
         // Act
         let result = await sut.deleteById(2);

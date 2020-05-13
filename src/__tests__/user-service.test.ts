@@ -286,7 +286,7 @@ describe('userService', () => {
         });
 
         // Act
-        let result = await sut.authenticateUser("test", "test");
+        let result = await sut.authenticateUser('test', 'test');
 
         // Assert
         expect(result).toBeTruthy();
@@ -303,7 +303,7 @@ describe('userService', () => {
 
         // Act
         try {
-            await sut.authenticateUser("test", "test");
+            await sut.authenticateUser('test', 'test');
         } catch (e) {
 
             // Assert
@@ -319,7 +319,7 @@ describe('userService', () => {
 
         // Act
         try {
-            await sut.authenticateUser("test", "test");
+            await sut.authenticateUser('test', 'test');
         } catch (e) {
 
             // Assert

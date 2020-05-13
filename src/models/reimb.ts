@@ -2,8 +2,8 @@ export class Reimb {
 
     reimb_id: number;
     amount: number;
-    submitted: string;
-    resolved: string;
+    submitted: Date;
+    resolved: Date;
     description: string;
     reciept: any;
     author: string;
@@ -14,8 +14,8 @@ export class Reimb {
     constructor(
         id: number,
         am: number,
-        sub: string,
-        res: string,
+        sub: Date,
+        res: Date,
         des: string,
         rec: any,
         auth: string,
