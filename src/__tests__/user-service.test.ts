@@ -334,6 +334,7 @@ describe('userService', () => {
         Validator.isValidObject = jest.fn().mockReturnValue(true);
         mockRepo.isUsernameAvailable = jest.fn().mockReturnValue(true);
         mockRepo.isEmailAvailable = jest.fn().mockReturnValue(true);
+        mockRepo.save =  jest.fn().mockReturnValue(mockUsers[5]);
 
         // Act
         let newUser = new User(6, 'test', 'password', 'test', 'test', 'test@revature.com', 'User')
@@ -352,7 +353,7 @@ describe('userService', () => {
         Validator.isValidObject = jest.fn().mockReturnValue(true);
         mockRepo.isUsernameAvailable = jest.fn().mockReturnValue(true);
         mockRepo.isEmailAvailable = jest.fn().mockReturnValue(true);
-
+        mockRepo.save =  jest.fn().mockReturnValue(mockUsers[5]);
         // Act
         try {
 
@@ -374,6 +375,7 @@ describe('userService', () => {
         Validator.isValidObject = jest.fn().mockReturnValue(true);
         mockRepo.isUsernameAvailable = jest.fn().mockReturnValue(false);
         mockRepo.isEmailAvailable = jest.fn().mockReturnValue(true);
+        mockRepo.save =  jest.fn().mockReturnValue(mockUsers[5]);
 
         // Act
         try {
@@ -396,6 +398,7 @@ describe('userService', () => {
         Validator.isValidObject = jest.fn().mockReturnValue(true);
         mockRepo.isUsernameAvailable = jest.fn().mockReturnValue(true);
         mockRepo.isEmailAvailable = jest.fn().mockReturnValue(false);
+        mockRepo.save =  jest.fn().mockReturnValue(mockUsers[5]);
 
         // Act
         try {
@@ -415,6 +418,7 @@ describe('userService', () => {
         expect.assertions(3);
 
         Validator.isValidObject = jest.fn().mockReturnValue(true);
+        mockRepo.update =  jest.fn().mockReturnValue(mockUsers[5]);
 
         // Act
         let result = await sut.updateUser(mockUsers[0]);
@@ -427,6 +431,7 @@ describe('userService', () => {
         expect.assertions(3);
 
         Validator.isValidObject = jest.fn().mockReturnValue(false);
+        mockRepo.update =  jest.fn().mockReturnValue(mockUsers[5]);
 
         // Act
         try {
