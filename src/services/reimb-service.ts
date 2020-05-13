@@ -1,4 +1,4 @@
-import { PostRepository } from "../repos/post-repo";
+import { PostRepository } from "../repos/reimb-repo";
 
 export class PostService {
 

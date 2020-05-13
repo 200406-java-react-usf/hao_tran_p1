@@ -1,11 +1,11 @@
-create or alter table ers_user_roles (
+create  table ers_user_roles (
     role_id serial,
     role_name varchar(25) not null,
 
     constraint role_id_pk primary key (role_id)
 );
 
-create or alter table ers_users (
+create  table ers_users (
     ers_user_id serial,
     username varchar(25) unique not null,
     password varchar(256) not null,
@@ -18,21 +18,21 @@ create or alter table ers_users (
     constraint user_role_id_fk foreign key (user_role_id) references ers_user_roles
 );
 
-create or alter table ers_reimb_types (
+create table ers_reimb_types (
     reimb_type_id serial,
     reimb_type varchar(10) not null,
 
     constraint reimb_type_id primary key (reimb_type_id)
 );
 
-create or alter table ers_reimb_statuses (
+create table ers_reimb_statuses (
     reimb_status_id serial,
     reimb_status varchar(10) not null,
 
     constraint reimb_status_id primary key (reimb_status_id)
 );
 
-create or alter table ers_reimbursements (
+create  table ers_reimbursements (
     reimb_id serial,
     amount decimal(6, 2) not null,
     submitted timestamp not null,
@@ -46,7 +46,9 @@ create or alter table ers_reimbursements (
 
     constraint reimb_id_pk primary key (reimb_id),
     constraint reimb_status_id_fk foreign key (reimb_status_id) references ers_reimb_statuses,
-    constraint reimb_type_id_fk foreign key (reimb_type_id) references ers_reimb_types
+    constraint reimb_type_id_fk foreign key (reimb_type_id) references ers_reimb_types,
+    constraint author_id_fk foreign key (author_id) references ers_users,
+    constraint resolver_id_fk foreign key (resolver_id) references ers_users
 
 );
 --
@@ -94,12 +96,14 @@ values
 insert into
     ers_reimbursements (amount, submitted, resolved, description, reciept, author_id, resolver_id, reimb_status_id, reimb_type_id)
 values
-    (100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', null, 1, 1, 1);
+    (100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 1, null, 1, 1);
 
 --
 SELECT
     *
 FROM
     ers_reimbursements
-    INNER JOIN ers_reimb_types ON ers_users.reimb_type_id = ers_reimb_types.reimb_type_id
-    INNER JOIN ers_reimb_statuses ON ers_users.reimb_status_id = ers_reimb_statuses.reimb_status_id
+    INNER JOIN ers_reimb_types ON ers_reimbursements.reimb_type_id = ers_reimb_types.reimb_type_id
+    INNER JOIN ers_reimb_statuses ON ers_reimbursements.reimb_status_id = ers_reimb_statuses.reimb_status_id
+    INNER JOIN ers_users ON ers_reimbursements.author_id = ers_users.ers_user_id
+    AND ers_reimbursements.resolver_id = ers_users.ers_user_id
