@@ -21,7 +21,7 @@ export class UserRepository implements CrudRepository<User> {
             au.last_name,
             au.email,
             ur.name as role_name
-        from app_users au
+        from ers_users au
         join user_roles ur
         on au.role_id = ur.id
     `;
