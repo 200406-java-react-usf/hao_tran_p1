@@ -1,8 +1,8 @@
-import { PostRepository } from "../repos/reimb-repo";
+import { ReimbRepository } from "../repos/reimb-repo";
 
 export class PostService {
 
-    constructor(private postRepo: PostRepository) {
+    constructor(private postRepo: ReimbRepository) {
         this.postRepo = postRepo;
     }
 

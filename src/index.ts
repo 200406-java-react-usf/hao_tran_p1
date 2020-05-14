@@ -6,7 +6,6 @@ import path from 'path';
 
 
 import { UserRouter } from './routers/reimb-router';
-import { PostRouter } from './routers/post-router';
 import { AuthRouter } from './routers/auth-router';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
@@ -36,7 +35,6 @@ app.use(sessionMiddleware);
 app.use(corsFilter);
 app.use('/', express.json());
 app.use('/users', UserRouter);
-app.use('/posts', PostRouter);
 app.use('/auth', AuthRouter);
 
 app.listen(8080, () => {
