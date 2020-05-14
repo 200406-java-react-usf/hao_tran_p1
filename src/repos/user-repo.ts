@@ -13,17 +13,17 @@ import { mapUserResultSet } from '../util/result-set-mapper';
 export class UserRepository implements CrudRepository<User> {
 
     baseQuery = `
-        select
-            eu.ers_user_id, 
-            eu.username, 
-            eu.password, 
-            eu.first_name,
-            eu.last_name,
-            eu.email,
-            ur.name as role_name
-        from ers_users eu
-        join user_roles ur
-        on eu.role_id = ur.role_id
+    select
+    eu.ers_user_id, 
+    eu.username, 
+    eu.password, 
+    eu.first_name,
+    eu.last_name,
+    eu.email,
+    ur.role_name as role_name
+    from ers_users eu
+    join ers_user_roles ur
+    on eu.user_role_id = ur.role_id
     `;
 
     async getAll(): Promise<User[]> {
