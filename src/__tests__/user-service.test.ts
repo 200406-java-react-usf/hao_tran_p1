@@ -421,6 +421,7 @@ describe('userService', () => {
         mockRepo.update =  jest.fn().mockReturnValue(mockUsers[5]);
 
         // Act
+        // id, name , value
         let result = await sut.updateUser(mockUsers[0]);
 
         // Assert

@@ -141,11 +141,6 @@ export class UserService {
     async updateUser(updatedUser: User): Promise<boolean> {
         
         try {
-
-            if (!isValidObject(updatedUser)) {
-                throw new BadRequestError('Invalid user provided (invalid values found).');
-            }
-
             // let repo handle some of the other checking since we are still mocking db
             return await this.userRepo.update(updatedUser);
         } catch (e) {
