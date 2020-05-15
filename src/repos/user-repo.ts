@@ -23,6 +23,7 @@ export class UserRepository implements CrudRepository<User> {
     ur.role_name as role_name
     from ers_users eu
     join ers_user_roles ur
+    
     on eu.user_role_id = ur.role_id
     `;
 
@@ -105,16 +106,16 @@ export class UserRepository implements CrudRepository<User> {
             client = await connectionPool.connect();
 
             // WIP: hacky fix since we need to make two DB calls
-            let roleId = (await client.query('select id from user_roles where name = $1', [newUser.role])).rows[0].id;
+            // let roleId = (await client.query('select id from user_roles where name = $1', [newUser.role])).rows[0].id;
 
             let sql = `
                 insert into app_users (username, password, first_name, last_name, email, role_id) 
                 values ($1, $2, $3, $4, $5, $6) returning id
             `;
 
-            let rs = await client.query(sql, [newUser.username, newUser.password, newUser.firstName, newUser.lastName, newUser.email, roleId]);
+            // let rs = await client.query(sql, [newUser.username, newUser.password, newUser.firstName, newUser.lastName, newUser.email, roleId]);
 
-            newUser.id = rs.rows[0].id;
+            // newUser.ers_user_id = rs.rows[0].ers_user_id;
 
             return newUser;
 
