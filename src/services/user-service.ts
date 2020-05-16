@@ -16,54 +16,52 @@ export class UserService {
         this.userRepo = userRepo;
     }
 
+    /**
+     * Gets all users
+     * @returns all users 
+     */
     async getAllUsers(): Promise<User[]> {
-
         let users = await this.userRepo.getAll();
-
         if (users.length == 0) {
             throw new ResourceNotFoundError();
         }
-
-        return users.map(this.removePassword);
-
+        return users;
     }
 
+    /**
+     * Gets user by id
+     * @param id 
+     * @returns user by id 
+     */
     async getUserById(id: number): Promise<User> {
-
         if (!isValidId(id)) {
             throw new BadRequestError();
         }
-
         let user = await this.userRepo.getById(id);
-
         if (isEmptyObject(user)) {
             throw new ResourceNotFoundError();
         }
-
-        return this.removePassword(user);
-
+        return user;
     }
 
+    /**
+     * Gets user by unique key
+     * @param queryObj 
+     * @returns user by unique key 
+     */
     async getUserByUniqueKey(queryObj: any): Promise<User> {
 
-        // we need to wrap this up in a try/catch in case errors are thrown for our awaits
         try {
-
             let queryKeys = Object.keys(queryObj);
-
             if(!queryKeys.every(key => isPropertyOf(key, User))) {
                 throw new BadRequestError();
             }
-
-            // we will only support single param searches (for now)
             let key = queryKeys[0];
             let val = queryObj[key];
 
-            // if they are searching for a user by id, reuse the logic we already have
-            if (key === 'id') {
+            if (key === 'ers_user_id') {
                 return await this.getUserById(+val);
             }
-
             // ensure that the provided key value is valid
             if(!isValidStrings(val)) {
                 throw new BadRequestError();
@@ -75,7 +73,7 @@ export class UserService {
                 throw new ResourceNotFoundError();
             }
 
-            return this.removePassword(user);
+            return user;
 
         } catch (e) {
             throw e;
@@ -91,15 +89,13 @@ export class UserService {
             }
 
             let authUser: User;
-            
             authUser = await this.userRepo.getUserByCredentials(un, pw);
-           
 
             if (isEmptyObject(authUser)) {
                 throw new AuthenticationError('Bad credentials provided.');
             }
 
-            return this.removePassword(authUser);
+            return authUser;
 
         } catch (e) {
             throw e;
@@ -130,7 +126,7 @@ export class UserService {
             newUser.role_name = 'User'; // all new registers have 'User' role by default
             const persistedUser = await this.userRepo.save(newUser);
 
-            return this.removePassword(persistedUser);
+            return persistedUser;
 
         } catch (e) {
             throw e
@@ -141,7 +137,6 @@ export class UserService {
     async updateUser(updatedUser: User): Promise<boolean> {
         
         try {
-            // let repo handle some of the other checking since we are still mocking db
             return await this.userRepo.update(updatedUser);
         } catch (e) {
             throw e;
@@ -186,11 +181,6 @@ export class UserService {
         return false;
     }
 
-    private removePassword(user: User): User {
-        if(!user || !user.password) return user;
-        let usr = {...user};
-        delete usr.password;
-        return usr;   
-    }
+
 
 }

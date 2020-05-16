@@ -1,9 +1,6 @@
 import { User } from '../models/user';
 import { CrudRepository } from './crud-repo';
 import {
-    NotImplementedError,
-    ResourceNotFoundError,
-    ResourcePersistenceError,
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
@@ -20,8 +17,8 @@ export class UserRepository implements CrudRepository<User> {
     eu.first_name,
     eu.last_name,
     eu.email,
-    ur.role_name as role_name
-    from ers_users eu
+    ur.role_name as role_name,
+    from ers_users eu,
     join ers_user_roles ur
     
     on eu.user_role_id = ur.role_id
@@ -56,7 +53,7 @@ export class UserRepository implements CrudRepository<User> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where eu.id = $1`;
+            let sql = `${this.baseQuery} where eu.ers_user_id = $1`;
             let rs = await client.query(sql, [id]);
             return mapUserResultSet(rs.rows[0]);
         } catch (e) {
@@ -118,11 +115,11 @@ export class UserRepository implements CrudRepository<User> {
         try {
             client = await connectionPool.connect();
             // WIP: hacky fix since we need to make two DB calls
-            let roleId = (await client.query('select role_id from ers_user_roles where name = $1', [newUser.role_name])).rows[0].id;
+            let roleId = (await client.query('select role_id from ers_user_roles where name = $1', [newUser.role_name])).rows[0].role_id;
 
             let sql = `
-                insert into eu (username, password, first_name, last_name, email, user_role_id) 
-                values ($1, $2, $3, $4, $5, $6) returning id
+                insert into ers_users (username, password, first_name, last_name, email, user_role_id) 
+                values ($1, $2, $3, $4, $5, $6) returning ers_user_id
             `;
             let rs = await client.query(sql, [newUser.username, newUser.password, newUser.first_name, newUser.last_name, newUser.email, roleId]);
 
@@ -139,11 +136,16 @@ export class UserRepository implements CrudRepository<User> {
 
     }
 
+    /**
+     * Updates user repository
+     * @param updatedUser 
+     * @returns boolean 
+     */
     async update(updatedUser: User): Promise<boolean> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            let roleId = (await client.query('select role_id from ers_user_roles where name = $1', [updatedUser.role_name])).rows[0].id;
+            let roleId = (await client.query('select role_id from ers_user_roles where name = $1', [updatedUser.role_name])).rows[0].role_id;
             let sql = `update ers_users set username = $2 password = $3 first_name = $4 last_name = $5 email = $6  user_role_id = $7 where user_role_id = $1`;
             let rs = await client.query(sql, [updatedUser.ers_user_id, updatedUser.username, updatedUser.password, updatedUser.first_name, updatedUser.last_name, updatedUser.email, roleId]);
             return true;
@@ -155,12 +157,17 @@ export class UserRepository implements CrudRepository<User> {
 
     }
 
+    /**
+     * Deletes by id
+     * @param id  
+     * @returns by id 
+     */
     async deleteById(id: number): Promise<boolean> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            let sql = ``;
-            let rs = await client.query(sql, []);
+            let sql = `delete from ers_users where ers_user_id = $1`;
+            let rs = await client.query(sql, [id]);
             return true;
         } catch (e) {
             throw new InternalServerError();

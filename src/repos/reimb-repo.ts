@@ -1,111 +1,201 @@
+import { Reimb } from '../models/reimb';
+import { CrudRepository } from './crud-repo';
+import {
+    InternalServerError
+} from '../errors/errors';
+import { PoolClient } from 'pg';
+import { connectionPool } from '..';
+import { mapReimbResultSet } from '../util/result-set-mapper';
 
-// import { CrudRepository } from "./crud-repo";
-// import { Reimb } from "../models/reimb";
-// import { PoolClient } from 'pg';
-// import { connectionPool } from '..';
-// import { mapReimbResultSet } from "../util/result-set-mapper"
-// import {
-//     BadRequestError,
-//     ResourceNotFoundError,
-//     InternalServerError,
-//     NotImplementedError,
-//     ResourcePersistenceError,
-//     AuthenticationError
-// } from "../errors/errors";
-// import {
-//     isValidId,
-//     isValidStrings,
-//     isEmptyObject
-// } from "../util/validator"
+export class ReimbRepository implements CrudRepository<Reimb> {
 
-// export class ReimbRepository implements CrudRepository<Reimb> {
-//     baseQuery = `
-//     select
-//         re.reimb_id, 
-//         re.amount, 
-//         re.submitted, 
-//         re.resolved,
-//         re.description,
-//         re.reciept,
-//         ur.name as role_name
-//     from ers_reimbursements re
-//     join ers_reimb_statuses rs
-//     on re.reimb_status_id = rs.reimb_status_id
-//     join ers_reimb_types rt
-//     on re.reimb_type_id = rt.reimb_type_id`;
-//     /**
-//      * Gets all Reimb
-//      * @returns reimb[]
-//      */
-//     async getAll(): Promise<Reimb[]> {
-//         let client: PoolClient;
-//         try {
-//             client = await connectionPool.connect();
-//             let sql = "SELECT * FROM reimbs";
-//             let rs = await client.query(sql);
-//             return rs.rows.map(mapReimbResultSet);
-//         } catch (e) {
-//             throw new InternalServerError();
-//         } finally {
-//             client && client.release();
-//         }
-//     };
+    baseQuery = `
+    select
+    rb.ers_reimb_id, 
+    rb.amount, 
+    rb.submitted, 
+    rb.resolved,
+    rb.reciept,
+    eu.username as rb.author_id,
+    eu.username as rb.resolver_id,
+    rs.reimb_statuses as reimb_status_id,
+    rt.reimb_types as reimb_type_id
 
-//     getById(id: number): Promise<Reimb> {
+    from ers_reimbs rb
 
-//         return new Promise<Reimb>((resolve, reject) => {
-//             if (typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
-//                 reject(new BadRequestError());
-//                 return;
-//             }
+    INNER JOIN ers_reimb_types rt
+    ON rb.reimb_type_id =rt.reimb_type_id
 
-//             setTimeout(function () {
+    INNER JOIN ers_reimb_statuses rs
+    ON rb.reimb_status_id = rs.reimb_status_id
 
-//                 const post: Reimb = { ...data.filter(post => post.id === id).pop() };
+    INNER JOIN ers_users eu
+    
+    ON rb.author_id = eu.ers_user_id
+    AND rb.resolver_id = eu.ers_user_id
+    `;
 
-//                 if (!post) {
-//                     reject(new ResourceNotFoundError());
-//                     return;
-//                 }
+    /**
+     * Gets all reimbs, for testing
+     * @returns all reimb[]
+     */
+    async getAll(): Promise<Reimb[]> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery}`;
+            let rs = await client.query(sql); // rs = ResultSet
+            return rs.rows.map(mapReimbResultSet);
+        } catch (e) {
+            console.log(e);
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
 
-//                 resolve(post);
 
-//             }, 250);
+    /**
+     * Gets by id
+     * @param id 
+     * @returns by id 
+     */
+    async getById(id: number): Promise<Reimb> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where rb.id = $1`;
+            let rs = await client.query(sql, [id]);
+            return mapReimbResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
 
-//         });
-//     }
+    /**
+     * Gets reimb by unique key
+     * @param key 
+     * @param val 
+     * @returns reimb by unique key 
+     */
+    async getReimbByUniqueKey(key: string, val: string): Promise<Reimb> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where rb.${key} = $1`;
+            let rs = await client.query(sql, [val]);
+            return mapReimbResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
 
-//     save(newReimb: Reimb): Promise<Reimb> {
-//         return new Promise<Reimb>((resolve, reject) => {
-//             reject(new NotImplementedError());
-//         });
-//     }
+    /**
+     * Saves reimb repository
+     * @param newReimb 
+     * @returns save 
+     */
+    async save(newReimb: Reimb): Promise<Reimb> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+            // WIP: hacky fix since we need to make two DB calls
+            let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [newReimb.reimb_type])).rows[0].reimb_type_id;
+            let author_id = (await client.query('select author_id from ers_users where username = $1', [newReimb.author])).rows[0].ers_user_id;
 
-//     update(updatedReimb: Reimb): Promise<boolean> {
-//         return new Promise<boolean>((resolve, reject) => {
-//             reject(new NotImplementedError());
-//         });
-//     }
+            let sql = `
+                insert into ers_reimbs (reimbname, password, first_name, last_name, email, reimb_role_id) 
+                values ($1, $2, $3, $4, $5, $6) returning reimb_id
+            `;
+            let rs = await client.query(sql,
+                [
+                    newReimb.reimb_id,
+                    newReimb.amount,
+                    newReimb.submitted,
+                    newReimb.resolved,
+                    newReimb.description,
+                    //no reciept for new
+                    null,
+                    author_id,
+                    //no resolver
+                    null,
+                    //new reimb always pending
+                    1,
+                    reimb_type_id]);
 
-//     deleteById(id: number): Promise<boolean> {
-//         return new Promise<boolean>((resolve, reject) => {
-//             reject(new NotImplementedError());
-//         });
-//     }
+            newReimb.reimb_id = rs.rows[0].ers_reimb_id;
 
-//     getReimbsByReimberId(pid: number): Promise<Reimb[]> {
-//         return new Promise<Reimb[]>((resolve, reject) => {
+            return newReimb;
 
-//             if (typeof pid !== 'number' || !Number.isInteger(pid) || pid <= 0) {
-//                 reject(new BadRequestError());
-//                 return;
-//             }
+        } catch (e) {
+            console.log(e);
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
 
-//             setTimeout(function () {
-//                 const posts = data.filter(post => post.posterId == pid);
-//                 resolve(posts);
-//             }, 250);
+    }
 
-//         });
-//     }
-// }
+    /**
+     * Updates reimb repository
+     * @param updatedReimb 
+     * @returns boolean 
+     */
+    async update(updatedReimb: Reimb): Promise<boolean> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+
+            let reimb_status_id = (await client.query('select reimb_status_id from ers_reimb_statuses where reimb_status = $1', [updatedReimb.reimb_status])).rows[0].reimb_status_id;
+            let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [updatedReimb.reimb_type])).rows[0].reimb_type_id;
+            let author_id = (await client.query('select author_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
+            let resolver_id = (await client.query('select resolver_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
+
+            let sql = `update ers_reimbs set reimbname = $2 password = $3 first_name = $4 last_name = $5 email = $6  reimb_role_id = $7 where reimb_role_id = $1`;
+            let rs = await client.query(sql,
+                [
+                    updatedReimb.reimb_id,
+                    updatedReimb.amount,
+                    updatedReimb.submitted,
+                    updatedReimb.resolved,
+                    updatedReimb.description,
+                    updatedReimb.reciept,
+                    author_id,
+                    resolver_id,
+                    reimb_status_id,
+                    reimb_type_id
+                ]);
+            return true;
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+
+    }
+
+    /**
+     * Deletes by id
+     * @param id  
+     * @returns by id 
+     */
+    async deleteById(id: number): Promise<boolean> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+            let sql = `delete from ers_reimbs where reimb_id = $1`;
+            let rs = await client.query(sql, [id]);
+            return true;
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+
+    }
+
+}
