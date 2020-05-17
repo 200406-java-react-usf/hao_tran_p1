@@ -40,6 +40,6 @@ app.use('/auth', AuthRouter);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(3000, () => {
     console.log(`Application running and listening at: http://localhost:3000`);
 });
