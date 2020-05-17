@@ -37,6 +37,9 @@ app.use('/', express.json());
 app.use('/users', UserRouter);
 app.use('/auth', AuthRouter);
 
-app.listen(8080, () => {
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
     console.log(`Application running and listening at: http://localhost:8080`);
 });
