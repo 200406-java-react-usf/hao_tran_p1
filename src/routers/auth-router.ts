@@ -12,7 +12,7 @@ AuthRouter.get('', (req, resp) => {
 });
 
 AuthRouter.post('', async (req, resp) => {
-console.log("hit auth")
+
     try {
         const username = req.body.username;
         const password = req.body.password;
