@@ -92,7 +92,7 @@ export class UserService {
             authUser = await this.userRepo.getUserByCredentials(un, pw);
 
             if (isEmptyObject(authUser)) {
-                throw new AuthenticationError('Bad credentials provided.');
+                throw new AuthenticationError();
             }
 
             return authUser;
@@ -108,19 +108,19 @@ export class UserService {
         try {
 
             if (!isValidObject(newUser, 'id')) {
-                throw new BadRequestError('Invalid property values found in provided user.');
+                throw new BadRequestError();
             }
 
             let usernameAvailable = await this.isUsernameAvailable(newUser.username);
 
             if (!usernameAvailable) {
-                throw new ResourcePersistenceError('The provided username is already taken.');
+                throw new ResourcePersistenceError();
             }
         
             let emailAvailable = await this.isEmailAvailable(newUser.email);
     
             if (!emailAvailable) {
-                throw new  ResourcePersistenceError('The provided email is already taken.');
+                throw new  ResourcePersistenceError();
             }
 
             newUser.role_name = 'User'; // all new registers have 'User' role by default
@@ -159,11 +159,9 @@ export class UserService {
         try {
             await this.getUserByUniqueKey({'username': username});
         } catch (e) {
-            console.log('username is available')
             return true;
         }
 
-        console.log('username is unavailable')
         return false;
 
     }
@@ -173,11 +171,9 @@ export class UserService {
         try {
             await this.getUserByUniqueKey({'email': email});
         } catch (e) {
-            console.log('email is available')
             return true;
         }
 
-        console.log('email is unavailable')
         return false;
     }
 

@@ -47,7 +47,6 @@ export class ReimbRepository implements CrudRepository<Reimb> {
             let rs = await client.query(sql); // rs = ResultSet
             return rs.rows.map(mapReimbResultSet);
         } catch (e) {
-            console.log(e);
             throw new InternalServerError();
         } finally {
             client && client.release();
@@ -80,7 +79,7 @@ export class ReimbRepository implements CrudRepository<Reimb> {
      * @param val 
      * @returns reimb by unique key 
      */
-    async getReimbByUniqueKey(key: string, val: string): Promise<Reimb> {
+    async getReimbByUniqueKey(key: string, val: any): Promise<Reimb> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
@@ -132,7 +131,6 @@ export class ReimbRepository implements CrudRepository<Reimb> {
             return newReimb;
 
         } catch (e) {
-            console.log(e);
             throw new InternalServerError();
         } finally {
             client && client.release();

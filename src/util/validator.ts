@@ -34,8 +34,8 @@ export const isPropertyOf = (prop: string, type: any) => {
 
 }
 
-export const isValidStatus = (status: number) => {
-    return status && status == 1 || status == 2 || status == 3;
+export const isValidStatus = (status: string) => {
+    return status && status == "pending" || status == "approved" || status == "denied";
 }
 
 export function isEmptyObject<T>(obj: T) {
@@ -48,5 +48,6 @@ export default {
     isValidStrings,
     isValidObject,
     isPropertyOf,
-    isValidStatus
+    isValidStatus,
+    isEmptyObject
 }

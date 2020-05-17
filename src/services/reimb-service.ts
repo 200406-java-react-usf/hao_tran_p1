@@ -1,9 +1,10 @@
 import { Reimb } from "../models/reimb";
 import { ReimbRepository } from "../repos/reimb-repo";
-import { isValidId, isValidStrings, isValidObject, isPropertyOf, isEmptyObject } from "../util/validator";
+import { isValidId, isValidStrings, isValidObject, isPropertyOf, isEmptyObject, isValidStatus } from "../util/validator";
 import { 
     BadRequestError, 
     ResourceNotFoundError, 
+    ResourcePersistenceError,
     NotImplementedError, 
     AuthenticationError 
 } from "../errors/errors";
@@ -58,12 +59,8 @@ export class ReimbService {
             let key = queryKeys[0];
             let val = queryObj[key];
 
-            if (key === 'ers_reimb_id') {
+            if (key === 'reimb_id') {
                 return await this.getReimbById(+val);
-            }
-            // ensure that the provided key value is valid
-            if(!isValidStrings(val)) {
-                throw new BadRequestError();
             }
 
             let reimb = await this.reimbRepo.getReimbByUniqueKey(key, val);
@@ -84,7 +81,7 @@ export class ReimbService {
         try {
 
             if (!isValidObject(newReimb, 'id')) {
-                throw new BadRequestError('Invalid property values found in provided reimb.');
+                throw new BadRequestError();
             }
 
             newReimb.reimb_status = 'pending'; // all new registers have 'Reimb' role by default
@@ -93,7 +90,7 @@ export class ReimbService {
             return persistedReimb;
 
         } catch (e) {
-            throw e
+            throw e;
         }
 
     }
@@ -101,6 +98,15 @@ export class ReimbService {
     async updateReimb(updatedReimb: Reimb): Promise<boolean> {
         
         try {
+            if (!isValidId(updatedReimb.reimb_id)) {
+                throw new BadRequestError();
+            }
+            if (!isValidObject(updatedReimb)) {
+                throw new BadRequestError();
+            }
+            if (!isValidStatus(updatedReimb.reimb_status)) {
+                throw new BadRequestError();
+            }
             return await this.reimbRepo.update(updatedReimb);
         } catch (e) {
             throw e;
