@@ -12,12 +12,13 @@ AuthRouter.get('', (req, resp) => {
 });
 
 AuthRouter.post('', async (req, resp) => {
-
+console.log("hit auth")
     try {
-
-        const { username, password } = req.body;
+        const username = req.body.username;
+        const password = req.body.password;
         let authUser = await userService.authenticateUser(username, password);
         let payload = new Principal(authUser.ers_user_id, authUser.username, authUser.role_name);
+        console.log(payload);
         req.session.principal = payload;
         resp.status(200).json(payload);
         

@@ -6,6 +6,8 @@ export const UserRouter = express.Router();
 const userService = AppConfig.userService;
 
 UserRouter.get('', async (req, res) => {
+    console.log("hit users")
+
     try {
         let payload = await userService.getAllUsers();
         res.status(200).json(payload);
