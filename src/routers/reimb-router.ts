@@ -13,7 +13,7 @@ const reimbService = AppConfig.reimbService;
   * get all reimbs
   * for testing
   */
-ReimbRouter.get('/allreimb', adminGuard, async (req, res) => {
+ReimbRouter.get('/allreimbs', adminGuard, async (req, res) => {
 
     try {
 
@@ -51,20 +51,19 @@ ReimbRouter.get('/:id', async (req, res) => {
   * get 1 reimb
   * for testing
   */
- ReimbRouter.get('/', async (req, res) => {
-    let query = req.body.data;
-    try {
-        let payload = await reimbService.getReimbByUniqueKey(query);
+ ReimbRouter.get('/search', async (req, res) => {
+    let reqURL = url.parse(req.url, true);
+    if(!isEmptyObject<ParsedUrlQuery>(reqURL.query)) {
+        let payload = await reimbService.getReimbByUniqueKey({...reqURL.query});
         res.status(200).json(payload);
-    } catch (e) {
-        res.status(e.statusCode).json(e);
+    } else {
+        let payload = await reimbService.getAllReimbs();
+        res.status(200).json(payload);
     }
+
 });
 
-ReimbRouter.post('', async (req, res) => {
-
-    console.log('POST REQUEST RECEIVED AT /reimbs');
-    console.log(req.body);
+ReimbRouter.put('', async (req, res) => {
     try {
         let newReimb = await reimbService.addNewReimb(req.body);
         res.status(201).json(newReimb);

@@ -7,6 +7,7 @@ import path from 'path';
 
 import { UserRouter } from './routers/user-router';
 import { AuthRouter } from './routers/auth-router';
+import { ReimbRouter } from './routers/reimb-router';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
@@ -36,6 +37,7 @@ app.use(corsFilter);
 app.use('/', express.json());
 app.use('/users', UserRouter);
 app.use('/auth', AuthRouter);
+app.use('/reimbs', ReimbRouter);
 
 
 const PORT = process.env.PORT || 8080;
