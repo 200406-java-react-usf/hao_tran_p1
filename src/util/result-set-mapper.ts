@@ -12,7 +12,7 @@ export function mapUserResultSet(resultSet: UserSchema): User {
     return new User(
         resultSet.ers_user_id,
         resultSet.username,
-        resultSet.password,
+        resultSet.userpassword,
         resultSet.first_name,
         resultSet.last_name,
         resultSet.email,

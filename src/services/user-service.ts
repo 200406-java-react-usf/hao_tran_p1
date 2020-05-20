@@ -107,7 +107,7 @@ export class UserService {
         
         try {
 
-            if (!isValidObject(newUser, 'id')) {
+            if (!isValidObject(newUser, 'ers_user_id')) {
                 throw new BadRequestError();
             }
 
@@ -122,8 +122,6 @@ export class UserService {
             if (!emailAvailable) {
                 throw new  ResourcePersistenceError();
             }
-
-            newUser.role_name = 'User'; // all new registers have 'User' role by default
             const persistedUser = await this.userRepo.save(newUser);
 
             return persistedUser;
@@ -145,9 +143,9 @@ export class UserService {
     }
 
     async deleteById(id: number): Promise<boolean> {
-        
+        console.log("hit service")
         try {
-            throw new NotImplementedError();
+            return await this.userRepo.deleteById(id);
         } catch (e) {
             throw e;
         }

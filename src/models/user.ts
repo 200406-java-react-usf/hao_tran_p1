@@ -2,7 +2,7 @@ export class User {
 
     ers_user_id: number;
     username: string;
-    password: string;
+    userpassword: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -19,7 +19,7 @@ export class User {
     ) {
         this.ers_user_id = id;
         this.username = un;
-        this.password = pw;
+        this.userpassword = pw;
         this.first_name = fn;
         this.last_name = ln;
         this.email = email;

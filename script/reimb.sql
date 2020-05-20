@@ -8,7 +8,7 @@ create  table ers_user_roles (
 create  table ers_users (
     ers_user_id serial,
     username varchar(25) unique not null,
-    password varchar(256) not null,
+    userpassword varchar(256) not null,
     first_name varchar(25) not null,
     last_name varchar(25) not null,
     email varchar(256) not null,
@@ -66,7 +66,7 @@ values
     ('employee');
 --
 insert into
-    ers_users (username, password, first_name, last_name, email, user_role_id)
+    ers_users (username, userpassword, first_name, last_name, email, user_role_id)
 values
     ('testadmin', 'testadmin', 'John', 'Doe', 'john@test.com', 1),
     ('testmanager', 'testmanager', 'Yan', 'Doe', 'yan@test.com', 2),
