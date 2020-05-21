@@ -36,7 +36,7 @@ create  table ers_reimbursements (
     reimb_id serial,
     amount decimal(6, 2) not null,
     submitted timestamp not null,
-    resolved timestamp not null,
+    resolved timestamp,
     description text not null,
     reciept BYTEA,
     author_id int not null,

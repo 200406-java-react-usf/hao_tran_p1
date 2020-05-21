@@ -5,7 +5,19 @@ export const adminGuard = (req: Request, res: Response, next) => {
 
     if (!req.session.principal) {
         res.status(401).json(new AuthenticationError('No session found! Please login.'));
-    } else if (req.session.principal.role === 'Admin') {
+    } else if (req.session.principal.role === 'admin') {
+        next();
+    } else {
+        res.status(403).json(new AuthorizationError());
+    }
+
+}
+
+export const managerGuard = (req: Request, res: Response, next) => {
+
+    if (!req.session.principal) {
+        res.status(401).json(new AuthenticationError('No session found! Please login.'));
+    } else if (req.session.principal.role === 'manager') {
         next();
     } else {
         res.status(403).json(new AuthorizationError());

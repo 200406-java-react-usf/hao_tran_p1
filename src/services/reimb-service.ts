@@ -1,12 +1,12 @@
 import { Reimb } from "../models/reimb";
 import { ReimbRepository } from "../repos/reimb-repo";
 import { isValidId, isValidStrings, isValidObject, isPropertyOf, isEmptyObject, isValidStatus } from "../util/validator";
-import { 
-    BadRequestError, 
-    ResourceNotFoundError, 
+import {
+    BadRequestError,
+    ResourceNotFoundError,
     ResourcePersistenceError,
-    NotImplementedError, 
-    AuthenticationError 
+    NotImplementedError,
+    AuthenticationError
 } from "../errors/errors";
 
 
@@ -44,6 +44,16 @@ export class ReimbService {
         return reimb;
     }
 
+    async getReimbByUser(id: number): Promise<Reimb[]> {
+        if (!isValidId(id)) {
+            throw new BadRequestError();
+        }
+        let reimb = await this.reimbRepo.getByUserId(id);
+        if (isEmptyObject(reimb)) {
+            throw new ResourceNotFoundError();
+        }
+        return reimb;
+    }
     /**
      * Gets reimb by unique key
      * @param queryObj 
@@ -53,7 +63,7 @@ export class ReimbService {
 
         try {
             let queryKeys = Object.keys(queryObj);
-            if(!queryKeys.every(key => isPropertyOf(key, Reimb))) {
+            if (!queryKeys.every(key => isPropertyOf(key, Reimb))) {
                 throw new BadRequestError();
             }
             let key = queryKeys[0];
@@ -75,23 +85,22 @@ export class ReimbService {
             throw e;
         }
     }
-    async filterReimb(query:any): Promise<Reimb[]> {
+    async filterReimb(query: any): Promise<Reimb[]> {
         let status = query.status;
         let type = query.type;
-        console.log("service "+ status, type)
+        console.log("service " + status, type)
         let reimbs = await this.reimbRepo.getReimbByFilter(status, type);
 
         return reimbs;
     }
     async addNewReimb(newReimb: Reimb): Promise<Reimb> {
-        
+        console.log(newReimb);
         try {
 
-            if (!isValidObject(newReimb, 'id')) {
+            if (!isValidObject(newReimb, 'id',"resolved", "resolver", "reciept")) {
                 throw new BadRequestError();
             }
 
-            newReimb.reimb_status = 'pending'; // all new registers have 'Reimb' role by default
             const persistedReimb = await this.reimbRepo.save(newReimb);
 
             return persistedReimb;
@@ -103,12 +112,12 @@ export class ReimbService {
     }
 
     async updateReimb(updatedReimb: Reimb): Promise<boolean> {
-        
+
         try {
             if (!isValidId(updatedReimb.reimb_id)) {
                 throw new BadRequestError();
             }
-            if (!isValidObject(updatedReimb)) {
+            if (!isValidObject(updatedReimb,"resolved", "resolver")) {
                 throw new BadRequestError();
             }
             if (!isValidStatus(updatedReimb.reimb_status)) {
@@ -122,7 +131,7 @@ export class ReimbService {
     }
 
     async deleteById(id: number): Promise<boolean> {
-        
+
         try {
             throw new NotImplementedError();
         } catch (e) {

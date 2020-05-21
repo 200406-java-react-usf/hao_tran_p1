@@ -74,9 +74,31 @@ ReimbRouter.post('', async (req, res) => {
 
 });
 
+ReimbRouter.post('/new', async (req, res) => {
+    try {
+        let newReimb = await reimbService.addNewReimb(req.body);
+        res.status(201).json(newReimb);
+    } catch (e) {
+        res.status(e.statusCode).json(e);
+    }
+
+});
+
 ReimbRouter.post('/filter', async (req, res) => {
     try {
         let reimbs = await reimbService.filterReimb(req.body);
+        res.status(201).json(reimbs);
+    } catch (e) {
+        res.status(e.statusCode).json(e);
+    }
+
+});
+
+ReimbRouter.post('/user', async (req, res) => {
+
+
+    try {
+        let reimbs = await reimbService.getReimbByUser(req.body.id);
         res.status(201).json(reimbs);
     } catch (e) {
         res.status(e.statusCode).json(e);

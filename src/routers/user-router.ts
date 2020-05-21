@@ -4,14 +4,14 @@ import url from 'url';
 import { isEmptyObject } from '../util/validator';
 import { ParsedUrlQuery } from 'querystring';
 import { User } from '../models/user';
+import { adminGuard } from '../middleware/auth-middleware';
+
 
 export const UserRouter = express.Router();
 
 const userService = AppConfig.userService;
 
-UserRouter.get('/all', async (req, res) => {
-    console.log("hit users")
-
+UserRouter.get('/all', adminGuard, async (req, res) => {
     try {
         let payload = await userService.getAllUsers();
         res.status(200).json(payload);
@@ -20,7 +20,7 @@ UserRouter.get('/all', async (req, res) => {
     }
 });
 //search
-UserRouter.get('', async (req, resp) => {
+UserRouter.get('', adminGuard, async (req, resp) => {
 
     try {
 
@@ -40,7 +40,7 @@ UserRouter.get('', async (req, resp) => {
 
 });
 //update
-UserRouter.post('/update', async (req, res) => {
+UserRouter.post('/update', adminGuard, async (req, res) => {
 
     try {
 
@@ -60,7 +60,7 @@ UserRouter.post('/update', async (req, res) => {
 });
 
 //new
-UserRouter.post('/new', async (req, res) => {
+UserRouter.post('/new', adminGuard, async (req, res) => {
 
     try {
         let newUser: User = req.body;
@@ -79,10 +79,8 @@ UserRouter.post('/new', async (req, res) => {
 });
 
 //new
-UserRouter.delete('/:id', async (req, res) => {
-    let id = +req.params.id
-    console.log("hit delete " + id)
-
+UserRouter.delete('/:id', adminGuard, async (req, res) => {
+    let id = +req.params.id;
     try {
 
         let payload = await userService.deleteById(id);

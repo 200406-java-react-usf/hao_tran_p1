@@ -76,6 +76,19 @@ export class ReimbRepository implements CrudRepository<Reimb> {
         }
     }
 
+    async getByUserId(id: number): Promise<Reimb[]> {
+        let client: PoolClient;
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where author_id = $1`;
+            let rs = await client.query(sql, [id]);
+            return rs.rows.map(mapReimbResultSet);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
     /**
      * Gets reimb by unique key
      * @param key 
@@ -138,18 +151,18 @@ export class ReimbRepository implements CrudRepository<Reimb> {
             client = await connectionPool.connect();
             // WIP: hacky fix since we need to make two DB calls
             let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [newReimb.reimb_type])).rows[0].reimb_type_id;
-            let author_id = (await client.query('select author_id from ers_users where username = $1', [newReimb.author])).rows[0].ers_user_id;
+            let author_id = (await client.query('select ers_user_id from ers_users where username = $1', [newReimb.author])).rows[0].ers_user_id;
 
             let sql = `
-                insert into ers_reimbs (reimbname, password, first_name, last_name, email, reimb_role_id) 
-                values ($1, $2, $3, $4, $5, $6) returning reimb_id
+                insert into ers_reimbursements (amount, submitted, resolved, description, reciept, author_id, resolver_id, reimb_status_id, reimb_type_id) 
+                values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning reimb_id
             `;
             let rs = await client.query(sql,
                 [
-                    newReimb.reimb_id,
                     newReimb.amount,
                     newReimb.submitted,
-                    newReimb.resolved,
+                    // no resolved date
+                    null,
                     newReimb.description,
                     //no reciept for new
                     null,
@@ -160,7 +173,7 @@ export class ReimbRepository implements CrudRepository<Reimb> {
                     1,
                     reimb_type_id]);
 
-            newReimb.reimb_id = rs.rows[0].ers_reimb_id;
+            newReimb.reimb_id = rs.rows[0];
 
             return newReimb;
 
@@ -182,16 +195,22 @@ export class ReimbRepository implements CrudRepository<Reimb> {
         console.log(updatedReimb.reimb_status);
         try {
             client = await connectionPool.connect();
-
+            let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [updatedReimb.reimb_type])).rows[0].reimb_type_id;
             let reimb_status_id = (await client.query('select reimb_status_id from ers_reimb_statuses where reimb_status = $1', [updatedReimb.reimb_status])).rows[0].reimb_status_id;
-            let resolver_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
+            let resolver_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.resolver])).rows[0].ers_user_id;
+            let author_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
 
-            let sql = `update ers_reimbursements set resolved = $1, reciept = $2, resolver_id = $3, reimb_status_id = $4 where reimb_id = $5`;
+            let sql = `update ers_reimbursements set amount = $1, submitted = $2, resolved = $3, description = $4, reciept = $5, author_id = $6, resolver_id = $7, reimb_type_id = $8, reimb_status_id = $9 where reimb_id = $10`;
             let rs = await client.query(sql,
                 [
+                    updatedReimb.amount,
+                    updatedReimb.submitted,
                     updatedReimb.resolved,
+                    updatedReimb.description,
                     updatedReimb.reciept,
+                    author_id,
                     resolver_id,
+                    reimb_type_id,
                     reimb_status_id,
                     updatedReimb.reimb_id
                 ]);

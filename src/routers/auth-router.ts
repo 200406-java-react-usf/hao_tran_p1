@@ -28,3 +28,8 @@ AuthRouter.post('', async (req, resp) => {
     resp.send();
 
 });
+
+AuthRouter.get('', async (req,resp) => {
+    delete req.session.principal;
+    resp.status(204).send();
+});
