@@ -13,7 +13,7 @@ const reimbService = AppConfig.reimbService;
   * get all reimbs
   * for testing
   */
-ReimbRouter.get('/allreimbs', adminGuard, async (req, res) => {
+ReimbRouter.get('/allreimbs', async (req, res) => {
 
     try {
 

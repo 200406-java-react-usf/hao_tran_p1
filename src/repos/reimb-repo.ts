@@ -11,28 +11,30 @@ export class ReimbRepository implements CrudRepository<Reimb> {
 
     baseQuery = `
     select
-    rb.ers_reimb_id, 
+    rb.reimb_id, 
     rb.amount, 
     rb.submitted, 
     rb.resolved,
     rb.reciept,
-    eu.username as rb.author_id,
-    eu.username as rb.resolver_id,
-    rs.reimb_statuses as reimb_status_id,
-    rt.reimb_types as reimb_type_id
+    rb.description,
+    eu.username as author,
+    eu2.username as resolver,
+    rs.reimb_status as reimb_status,
+    rt.reimb_type as reimb_type
 
-    from ers_reimbs rb
+    from ers_reimbursements rb
 
-    INNER JOIN ers_reimb_types rt
+    left JOIN ers_reimb_types rt
     ON rb.reimb_type_id =rt.reimb_type_id
 
-    INNER JOIN ers_reimb_statuses rs
+    left JOIN ers_reimb_statuses rs
     ON rb.reimb_status_id = rs.reimb_status_id
 
-    INNER JOIN ers_users eu
-    
+    left JOIN ers_users eu
     ON rb.author_id = eu.ers_user_id
-    AND rb.resolver_id = eu.ers_user_id
+    
+    left JOIN ers_users eu2
+    on rb.resolver_id = eu.ers_user_id
     `;
 
     /**
@@ -44,7 +46,7 @@ export class ReimbRepository implements CrudRepository<Reimb> {
         try {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery}`;
-            let rs = await client.query(sql); // rs = ResultSet
+            let rs = await client.query(sql); 
             return rs.rows.map(mapReimbResultSet);
         } catch (e) {
             throw new InternalServerError();
@@ -63,7 +65,7 @@ export class ReimbRepository implements CrudRepository<Reimb> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where rb.id = $1`;
+            let sql = `${this.baseQuery} where rb.reimb_id = $1`;
             let rs = await client.query(sql, [id]);
             return mapReimbResultSet(rs.rows[0]);
         } catch (e) {
