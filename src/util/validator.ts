@@ -35,7 +35,7 @@ export const isPropertyOf = (prop: string, type: any) => {
 }
 
 export const isValidStatus = (status: string) => {
-    return status && status == "pending" || status == "approved" || status == "denied";
+    return status && status == "pending" || status == "approve" || status == "deny";
 }
 
 export function isEmptyObject<T>(obj: T) {

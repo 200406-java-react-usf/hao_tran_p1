@@ -24,17 +24,18 @@ export class ReimbRepository implements CrudRepository<Reimb> {
 
     from ers_reimbursements rb
 
-    left JOIN ers_reimb_types rt
+     JOIN ers_reimb_types rt
     ON rb.reimb_type_id =rt.reimb_type_id
 
-    left JOIN ers_reimb_statuses rs
+     JOIN ers_reimb_statuses rs
     ON rb.reimb_status_id = rs.reimb_status_id
 
     left JOIN ers_users eu
     ON rb.author_id = eu.ers_user_id
     
-    left JOIN ers_users eu2
-    on rb.resolver_id = eu.ers_user_id
+	left JOIN ers_users eu2
+    ON
+    rb.resolver_id = eu2.ers_user_id
     `;
 
     /**
@@ -65,7 +66,7 @@ export class ReimbRepository implements CrudRepository<Reimb> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where rb.reimb_id = $1`;
+            let sql = `${this.baseQuery} where reimb_id = $1`;
             let rs = await client.query(sql, [id]);
             return mapReimbResultSet(rs.rows[0]);
         } catch (e) {
@@ -88,6 +89,37 @@ export class ReimbRepository implements CrudRepository<Reimb> {
             let sql = `${this.baseQuery} where rb.${key} = $1`;
             let rs = await client.query(sql, [val]);
             return mapReimbResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
+
+    async getReimbByFilter(status: any, type: any): Promise<Reimb[]> {
+        let client: PoolClient;
+        console.log(status, type)
+
+        try {
+            client = await connectionPool.connect();
+            if (status && type){
+
+                let sql = `${this.baseQuery} where reimb_status = $1 and reimb_type = $2`;
+                let rs = await client.query(sql, [status, type]);
+                return rs.rows.map(mapReimbResultSet);
+            }else if (status){
+
+                let sql = `${this.baseQuery} where reimb_status = $1`;
+                let rs = await client.query(sql, [status]);
+
+                return rs.rows.map(mapReimbResultSet);
+            }else if (type){
+                let sql = `${this.baseQuery} where reimb_type = $1`;
+                let rs = await client.query(sql, [type]);
+                return rs.rows.map(mapReimbResultSet);
+            }
+           
+            
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -147,27 +179,21 @@ export class ReimbRepository implements CrudRepository<Reimb> {
      */
     async update(updatedReimb: Reimb): Promise<boolean> {
         let client: PoolClient;
+        console.log(updatedReimb.reimb_status);
         try {
             client = await connectionPool.connect();
 
             let reimb_status_id = (await client.query('select reimb_status_id from ers_reimb_statuses where reimb_status = $1', [updatedReimb.reimb_status])).rows[0].reimb_status_id;
-            let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [updatedReimb.reimb_type])).rows[0].reimb_type_id;
-            let author_id = (await client.query('select author_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
-            let resolver_id = (await client.query('select resolver_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
+            let resolver_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
 
-            let sql = `update ers_reimbs set reimbname = $2 password = $3 first_name = $4 last_name = $5 email = $6  reimb_role_id = $7 where reimb_role_id = $1`;
+            let sql = `update ers_reimbursements set resolved = $1, reciept = $2, resolver_id = $3, reimb_status_id = $4 where reimb_id = $5`;
             let rs = await client.query(sql,
                 [
-                    updatedReimb.reimb_id,
-                    updatedReimb.amount,
-                    updatedReimb.submitted,
                     updatedReimb.resolved,
-                    updatedReimb.description,
                     updatedReimb.reciept,
-                    author_id,
                     resolver_id,
                     reimb_status_id,
-                    reimb_type_id
+                    updatedReimb.reimb_id
                 ]);
             return true;
         } catch (e) {

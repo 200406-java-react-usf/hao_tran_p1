@@ -62,7 +62,7 @@ insert into
     ers_user_roles (role_name)
 values
     ('admin'),
-    ('finance manager'),
+    ('manager'),
     ('employee');
 --
 insert into
@@ -70,7 +70,7 @@ insert into
 values
     ('testadmin', 'testadmin', 'John', 'Doe', 'john@test.com', 1),
     ('testmanager', 'testmanager', 'Yan', 'Doe', 'yan@test.com', 2),
-    ('testemployee', 'testmanager', 'Sean', 'Doe', 'sean@test.com', 3);
+    ('testemployee', 'testemployee', 'Sean', 'Doe', 'sean@test.com', 3);
 --
 SELECT
     *
@@ -90,13 +90,21 @@ insert into
     ers_reimb_statuses (reimb_status)
 values
     ('pending'),
-    ('approved'),
-    ('denied');
+    ('approve'),
+    ('deny');
 --
 insert into
     ers_reimbursements (amount, submitted, resolved, description, reciept, author_id, resolver_id, reimb_status_id, reimb_type_id)
 values
-    (100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 1, null, 1, 1);
+    (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 1, null, 1, 1),
+    (300, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 1, null, 1, 2),
+
+    (400, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 3, null, 2, 1),
+
+    (500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 2, null, 2, 3),
+
+    (600, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'demo description', 'demo blob', 2, null, 3, 2);
+
 
 --
 SELECT

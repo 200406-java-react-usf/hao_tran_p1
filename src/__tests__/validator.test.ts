@@ -232,8 +232,8 @@ describe('validator', () => {
 
         // Act
         let result1 = isValidStatus("pending");
-        let result2 = isValidStatus("approved");
-        let result3 = isValidStatus("denied");
+        let result2 = isValidStatus("approve");
+        let result3 = isValidStatus("deny");
 
         // Assert
         expect(result1).toBe(true);
