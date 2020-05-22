@@ -111,7 +111,6 @@ export class UserRepository implements CrudRepository<User> {
      */
     async save(newUser: User): Promise<User> {
         let client: PoolClient;
-        console.log(newUser);
         try {
             client = await connectionPool.connect();
             // WIP: hacky fix since we need to make two DB calls
@@ -163,7 +162,6 @@ export class UserRepository implements CrudRepository<User> {
      */
     async deleteById(id: number): Promise<boolean> {
         let client: PoolClient;
-        console.log("hit repo "+ id);
         try {
             client = await connectionPool.connect();
             let sql = `delete from ers_users where ers_user_id = $1`;

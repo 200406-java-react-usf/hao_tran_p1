@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">99.06% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>103/103</span>
+                <span class='fraction'>105/106</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.83% </span>
+                <span class="strong">92.59% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>23/24</span>
+                <span class='fraction'>25/27</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">98.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>78/78</span>
+                <span class='fraction'>80/81</span>
             </div>
         
             
@@ -299,7 +299,11 @@
 <a name='L240'></a><a href='#L240'>240</a>
 <a name='L241'></a><a href='#L241'>241</a>
 <a name='L242'></a><a href='#L242'>242</a>
-<a name='L243'></a><a href='#L243'>243</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -496,7 +500,11 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -590,7 +598,7 @@ export class ReimbRepository implements CrudRepository&lt;Reimb&gt; {
         try {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery}`;
-            let rs = await client.query(sql); 
+            let rs = await client.query(sql);
             return rs.rows.map(mapReimbResultSet);
         } catch (e) {
             throw new InternalServerError();
@@ -656,24 +664,24 @@ export class ReimbRepository implements CrudRepository&lt;Reimb&gt; {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            if (status &amp;&amp; type){
+            if (status &amp;&amp; type) {
 &nbsp;
                 let sql = `${this.baseQuery} where reimb_status = $1 and reimb_type = $2`;
                 let rs = await client.query(sql, [status, type]);
                 return rs.rows.map(mapReimbResultSet);
-            }else if (status){
+            } else if (status) {
 &nbsp;
                 let sql = `${this.baseQuery} where reimb_status = $1`;
                 let rs = await client.query(sql, [status]);
 &nbsp;
                 return rs.rows.map(mapReimbResultSet);
-            }else if (<span class="missing-if-branch" title="if path not taken" >I</span>type){
+            } else if (<span class="missing-if-branch" title="if path not taken" >I</span>type) {
                 let sql = `${this.baseQuery} where reimb_type = $1`;
                 let rs = await client.query(sql, [type]);
                 return rs.rows.map(mapReimbResultSet);
             }
-           
-            
+&nbsp;
+&nbsp;
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -736,9 +744,13 @@ export class ReimbRepository implements CrudRepository&lt;Reimb&gt; {
             client = await connectionPool.connect();
             let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [updatedReimb.reimb_type])).rows[0].reimb_type_id;
             let reimb_status_id = (await client.query('select reimb_status_id from ers_reimb_statuses where reimb_status = $1', [updatedReimb.reimb_status])).rows[0].reimb_status_id;
-            let resolver_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.resolver])).rows[0].ers_user_id;
+            let resolver_id;
+            if (<span class="missing-if-branch" title="if path not taken" >I</span>updatedReimb.resolver) {
+                resolver_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.resolver])).rows[0].ers_user_id;
+            } else {
+<span class="cstat-no" title="statement not covered" >                resolver_id = null;</span>
+            }
             let author_id = (await client.query('select ers_user_id from ers_users where username = $1', [updatedReimb.author])).rows[0].ers_user_id;
-&nbsp;
             let sql = `update ers_reimbursements set amount = $1, submitted = $2, resolved = $3, description = $4, reciept = $5, author_id = $6, resolver_id = $7, reimb_type_id = $8, reimb_status_id = $9 where reimb_id = $10`;
             let rs = await client.query(sql,
                 [
@@ -749,7 +761,7 @@ export class ReimbRepository implements CrudRepository&lt;Reimb&gt; {
                     updatedReimb.reciept,
                     author_id,
                     resolver_id,
-                    reimb_type_id,
+                    reimb_type_id ,
                     reimb_status_id,
                     updatedReimb.reimb_id
                 ]);
@@ -790,7 +802,7 @@ export class ReimbRepository implements CrudRepository&lt;Reimb&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu May 21 2020 21:56:59 GMT-0500 (Central Daylight Time)
+                at Fri May 22 2020 08:07:55 GMT-0500 (Central Daylight Time)
             </div>
         </div>
         <script src="../prettify.js"></script>
