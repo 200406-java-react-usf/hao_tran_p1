@@ -28,7 +28,7 @@ export const connectionPool: Pool = new Pool({
 // logging configuration
 fs.mkdir(`${__dirname}/logs`, () => {});
 const logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' });
-
+console.log("log location: "+__dirname);
 // web server configuration
 const app = express();
 app.use(morgan('combined', { stream: logStream }));
