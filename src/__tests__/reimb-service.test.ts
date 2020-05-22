@@ -19,6 +19,7 @@ jest.mock('../repos/Reimb-repo', () => {
         save = jest.fn();
         update = jest.fn();
         deleteById = jest.fn();
+        getReimbByFilter = jest.fn();
     }
 
 });
@@ -189,6 +190,53 @@ describe('ReimbService', () => {
 
     });
 
+    test('should reject with reimb related to user', async () => {
+
+        // Arrange
+        expect.assertions(2);
+        Validator.isValidId = jest.fn().mockReturnValue(true);
+        mockRepo.getByUserId = jest.fn().mockReturnValue(mockReimbs);
+
+        // Act
+        let result = await sut.getReimbByUser(1);
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result.length).toBe(5);
+
+    });
+
+    test('should reject with BadRequestError if no reimb', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        Validator.isValidId = jest.fn().mockReturnValue(false);
+        mockRepo.getByUserId = jest.fn().mockReturnValue(mockReimbs);
+
+        // Act
+        try {
+            await sut.getReimbByUser(-1);
+        } catch (e) {
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+    test('should reject with ResourceNotFoundError if no reimb', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        Validator.isValidId = jest.fn().mockReturnValue(true);
+        mockRepo.getByUserId = jest.fn().mockReturnValue({});
+
+        // Act
+        try {
+            await sut.getReimbByUser(1);
+        } catch (e) {
+            // Assert
+            expect(e instanceof ResourceNotFoundError).toBe(true);
+        }
+
+    });
     //get by key, return list - bad req, no resource
     test('should resolve to Reimb when getReimbByUniqueKey is given a valid an known key(Reimbname)', async () => {
 
@@ -323,11 +371,11 @@ describe('ReimbService', () => {
         Validator.isValidId = jest.fn().mockReturnValue(true);
         Validator.isValidObject = jest.fn().mockReturnValue(true);
         mockRepo.save = jest.fn().mockImplementation((newReimb: Reimb) => {
-			return new Promise<Reimb>((resolve) => {
-				mockReimbs.push(newReimb); 
-				resolve(newReimb);
-			});
-		});
+            return new Promise<Reimb>((resolve) => {
+                mockReimbs.push(newReimb);
+                resolve(newReimb);
+            });
+        });
 
         // Act
         let newReimb = new Reimb(6, 500, date, date, 'text', 'reciept', 'author-test', 'resv-test', 'approved', 'food');
@@ -343,14 +391,14 @@ describe('ReimbService', () => {
         Validator.isValidId = jest.fn().mockReturnValue(true);
         Validator.isValidObject = jest.fn().mockReturnValue(true);
         mockRepo.save = jest.fn().mockImplementation((newReimb: Reimb) => {
-			return new Promise<Reimb>((resolve) => {
-				mockReimbs.push(newReimb); 
-				resolve(newReimb);
-			});
-		});
+            return new Promise<Reimb>((resolve) => {
+                mockReimbs.push(newReimb);
+                resolve(newReimb);
+            });
+        });
 
         // Act
-        let newReimb = new Reimb(6, 500, date, null, 'text', 'reciept', 'author-test', 'resv-test', 'approved', 'food');
+        let newReimb = new Reimb(6, 500, date, null, 'text', 'reciept', 'author-test', 'resv-test', 'approved', null);
 
         try {
             await sut.addNewReimb(newReimb);
@@ -501,5 +549,22 @@ describe('ReimbService', () => {
             expect(e instanceof NotImplementedError).toBe(true);
 
         }
+    });
+    test('should filterReimb with status and type', async () => {
+
+        // Arrange
+        expect.assertions(2);
+        mockRepo.getReimbByFilter = jest.fn().mockReturnValue(mockReimbs);
+        
+        let query = {
+            status: "pending",
+            type: "food"
+        }
+        // Act
+        let result = await sut.filterReimb(1);
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result.length).toBe(6);
+
     });
 });

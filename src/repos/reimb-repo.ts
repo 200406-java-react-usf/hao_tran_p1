@@ -111,8 +111,6 @@ export class ReimbRepository implements CrudRepository<Reimb> {
 
     async getReimbByFilter(status: any, type: any): Promise<Reimb[]> {
         let client: PoolClient;
-        console.log(status, type)
-
         try {
             client = await connectionPool.connect();
             if (status && type){
@@ -149,7 +147,6 @@ export class ReimbRepository implements CrudRepository<Reimb> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            // WIP: hacky fix since we need to make two DB calls
             let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [newReimb.reimb_type])).rows[0].reimb_type_id;
             let author_id = (await client.query('select ers_user_id from ers_users where username = $1', [newReimb.author])).rows[0].ers_user_id;
 
@@ -192,7 +189,6 @@ export class ReimbRepository implements CrudRepository<Reimb> {
      */
     async update(updatedReimb: Reimb): Promise<boolean> {
         let client: PoolClient;
-        console.log(updatedReimb.reimb_status);
         try {
             client = await connectionPool.connect();
             let reimb_type_id = (await client.query('select reimb_type_id from ers_reimb_types where reimb_type = $1', [updatedReimb.reimb_type])).rows[0].reimb_type_id;

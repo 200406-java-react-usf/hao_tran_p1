@@ -85,16 +85,17 @@ export class ReimbService {
             throw e;
         }
     }
+
     async filterReimb(query: any): Promise<Reimb[]> {
+        
         let status = query.status;
         let type = query.type;
-        console.log("service " + status, type)
         let reimbs = await this.reimbRepo.getReimbByFilter(status, type);
 
         return reimbs;
     }
+
     async addNewReimb(newReimb: Reimb): Promise<Reimb> {
-        console.log(newReimb);
         try {
 
             if (!isValidObject(newReimb, 'id',"resolved", "resolver", "reciept")) {

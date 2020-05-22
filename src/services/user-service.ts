@@ -127,7 +127,7 @@ export class UserService {
             return persistedUser;
 
         } catch (e) {
-            throw e
+            throw e;
         }
 
     }
@@ -143,7 +143,6 @@ export class UserService {
     }
 
     async deleteById(id: number): Promise<boolean> {
-        console.log("hit service")
         try {
             return await this.userRepo.deleteById(id);
         } catch (e) {

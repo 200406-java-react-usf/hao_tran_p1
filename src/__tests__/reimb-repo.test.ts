@@ -363,4 +363,110 @@ describe('reimbRepo', () => {
             expect(e instanceof InternalServerError).toBe(true);
         }
     });
+    test('should resolve to be true for getbyuserid', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(true);
+
+        // Act
+        let result = await sut.getByUserId(1);
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result[0]).toBe(true);
+
+    });
+
+    test('should throw InternalServerError', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        (mockConnect as jest.Mock).mockImplementation(() => {
+            return {
+                query: jest.fn().mockImplementation(() => { throw new Error(); }),
+                release: jest.fn()
+            };
+        });
+
+        // Act
+        try {
+            await sut.getByUserId(1);
+        } catch (e) {
+            // Assert
+            expect(e instanceof InternalServerError).toBe(true);
+        }
+    });
+    test('should resolve filter results', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(true);
+
+        // Act
+        let result = await sut.getReimbByFilter("pending", "food");
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result[0]).toBe(true);
+
+    });
+    test('should resolve filter results', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(true);
+
+        // Act
+        let result = await sut.getReimbByFilter(null, "food");
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result[0]).toBe(true);
+
+    });
+    test('should resolve filter results', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+
+        (mockMapper.mapReimbResultSet as jest.Mock).mockReturnValue(true);
+
+        // Act
+        let result = await sut.getReimbByFilter("pending", null);
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result[0]).toBe(true);
+
+    });
+
+    test('should throw InternalServerError when deleteById() is called but query is unsuccesful', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        (mockConnect as jest.Mock).mockImplementation(() => {
+            return {
+                query: jest.fn().mockImplementation(() => { throw new Error(); }),
+                release: jest.fn()
+            };
+        });
+
+        // Act
+        try {
+            await sut.getReimbByFilter("pending", "food");
+        } catch (e) {
+            // Assert
+            expect(e instanceof InternalServerError).toBe(true);
+        }
+    });
 });
