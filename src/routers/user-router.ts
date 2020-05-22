@@ -4,14 +4,14 @@ import url from 'url';
 import { isEmptyObject } from '../util/validator';
 import { ParsedUrlQuery } from 'querystring';
 import { User } from '../models/user';
-import { adminGuard } from '../middleware/auth-middleware';
+import { adminGuard } from '../middleware/admin-middleware';
 
 
 export const UserRouter = express.Router();
 
 const userService = AppConfig.userService;
 
-UserRouter.get('/all', adminGuard, async (req, res) => {
+UserRouter.get('/all', async (req, res) => {
     try {
         let payload = await userService.getAllUsers();
         res.status(200).json(payload);
@@ -20,7 +20,7 @@ UserRouter.get('/all', adminGuard, async (req, res) => {
     }
 });
 //search
-UserRouter.get('', adminGuard, async (req, resp) => {
+UserRouter.get('', async (req, res) => {
 
     try {
 
@@ -28,19 +28,19 @@ UserRouter.get('', adminGuard, async (req, resp) => {
 
         if (!isEmptyObject<ParsedUrlQuery>(reqURL.query)) {
             let payload = await userService.getUserByUniqueKey({ ...reqURL.query });
-            resp.status(200).json(payload);
+            res.status(200).json(payload);
         } else {
             let payload = await userService.getAllUsers();
-            resp.status(200).json(payload);
+            res.status(200).json(payload);
         }
 
     } catch (e) {
-        resp.status(e.statusCode).json(e);
+        res.status(e.statusCode).json(e);
     }
 
 });
 //update
-UserRouter.post('/update', adminGuard, async (req, res) => {
+UserRouter.post('/update', async (req, res) => {
 
     try {
 
@@ -60,7 +60,7 @@ UserRouter.post('/update', adminGuard, async (req, res) => {
 });
 
 //new
-UserRouter.post('/new', adminGuard, async (req, res) => {
+UserRouter.post('/new', async (req, res) => {
 
     try {
         let newUser: User = req.body;
@@ -79,7 +79,7 @@ UserRouter.post('/new', adminGuard, async (req, res) => {
 });
 
 //new
-UserRouter.delete('/:id', adminGuard, async (req, res) => {
+UserRouter.delete('/:id', async (req, res) => {
     let id = +req.params.id;
     try {
 

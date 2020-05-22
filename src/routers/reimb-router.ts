@@ -3,7 +3,7 @@ import express from 'express';
 import AppConfig from '../config/app';
 import { isEmptyObject } from '../util/validator';
 import { ParsedUrlQuery } from 'querystring';
-import { adminGuard } from '../middleware/auth-middleware';
+import { adminGuard } from '../middleware/admin-middleware';
 
 export const ReimbRouter = express.Router();
 

@@ -6,30 +6,31 @@ export const AuthRouter = express.Router();
 
 const userService = AppConfig.userService;
 
-AuthRouter.get('', (req, resp) => {
+AuthRouter.get('', (req, res) => {
     delete req.session.principal;
-    resp.status(204).send();
+    res.status(204).send();
 });
 
-AuthRouter.post('', async (req, resp) => {
+AuthRouter.post('', async (req, res) => {
 
     try {
         const username = req.body.username;
         const userpassword = req.body.userpassword;
         let authUser = await userService.authenticateUser(username, userpassword);
+        
         let payload = new Principal(authUser.ers_user_id, authUser.username, authUser.role_name);
         req.session.principal = payload;
-        resp.status(200).json(payload);
+        res.status(200).json(payload);
         
     } catch (e) {
-        resp.status(e.statusCode || 500).json(e);
+        res.status(e.statusCode || 500).json(e);
     }
 
-    resp.send();
+    res.send();
 
 });
 
-AuthRouter.get('', async (req,resp) => {
+AuthRouter.get('', async (req,res) => {
     delete req.session.principal;
-    resp.status(204).send();
+    res.status(204).send();
 });
