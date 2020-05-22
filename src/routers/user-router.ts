@@ -41,7 +41,7 @@ UserRouter.get('', async (req, res) => {
 });
 //update
 UserRouter.post('/update', async (req, res) => {
-
+    
     try {
 
         let update: User = req.body;
