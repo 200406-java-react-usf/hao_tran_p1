@@ -98,7 +98,7 @@ export class ReimbService {
     async addNewReimb(newReimb: Reimb): Promise<Reimb> {
         try {
 
-            if (!isValidObject(newReimb, 'id',"resolved", "resolver", "reciept")) {
+            if (!isValidObject(newReimb, 'reimb_id', "resolved", "resolver", "reciept")) {
                 throw new BadRequestError();
             }
 
@@ -118,7 +118,7 @@ export class ReimbService {
             if (!isValidId(updatedReimb.reimb_id)) {
                 throw new BadRequestError();
             }
-            if (!isValidObject(updatedReimb,"resolved", "resolver")) {
+            if (!isValidObject(updatedReimb, "resolved", "resolver", "reciept")) {
                 throw new BadRequestError();
             }
             if (!isValidStatus(updatedReimb.reimb_status)) {
